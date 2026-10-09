@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Voice Kitchen
 
-## Getting Started
+A voice food-order page. Press **Start Conversation**, say the order, and the finished order opens in a popup as JSON.
 
-First, run the development server:
+The menu is in `backend/src/data/menu.js`. There is no database. The server checks that file and adds the prices.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Run
+
+Add your Google key in `backend/.env`:
+
+```
+PORT=3002
+GEMINI_API_KEY=your_key_here
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Start the server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cd backend
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Start the page from the project folder:
 
-## Learn More
+```bash
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open http://localhost:3000.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The page calls `/api/...`. Those calls go to the server at `http://localhost:3002`. For another server address, set `SERVER_URL` before starting the page.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Order flow
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Start Conversation** asks the server for a short voice pass (`POST /api/talk/start`). The Google key stays on the server.
+2. The page opens the Gemini voice line with that pass, sends the microphone, and plays the spoken reply.
+3. When the order is finished, Gemini calls `createOrder` with the food names and amounts.
+4. The page sends that list to `POST /api/orders`. The server checks the menu, adds the prices, and the popup shows that JSON.
